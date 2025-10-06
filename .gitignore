@@ -18,3 +18,6 @@ __pycache__/
 *.pyc
 venv/
 .venv/
+test_data.py
+verify_model.py
+notes
