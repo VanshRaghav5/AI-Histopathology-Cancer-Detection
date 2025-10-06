@@ -1,0 +1,20 @@
+# datasets
+data/
+*.zip
+
+# trained models
+models/
+*.pth
+*.h5
+
+# notebooks cache
+.ipynb_checkpoints/
+
+# system files
+.DS_Store
+
+# python environment files
+__pycache__/
+*.pyc
+venv/
+.venv/
