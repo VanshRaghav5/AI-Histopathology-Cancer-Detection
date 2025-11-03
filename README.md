@@ -298,11 +298,11 @@ pnpm start
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | `https://xxx.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | `eyJhbGciOiJIUzI1NiIs...` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | confidential |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | `confidential...` |
 | `NEXT_PUBLIC_API_URL` | Frontend URL (for redirects) | `http://localhost:3000` |
 | `NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL` | Auth redirect URL | `http://localhost:3000/dashboard` |
-| `NEXT_PUBLIC_GEMINI_API_KEY` | Google Gemini API key | `AIzaSyAKZn6r9QW-yTxI...` |
+| `NEXT_PUBLIC_GEMINI_API_KEY` | Google Gemini API key | `confidential` |
 
 ## Contributing
 
