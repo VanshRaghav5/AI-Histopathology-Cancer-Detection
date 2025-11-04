@@ -5,8 +5,8 @@ This project focuses on the **deep learning model development, training, and ver
 The model classifies microscopic tissue slide images as **Benign** or **Malignant** and enhances interpretability using **Grad-CAM heatmaps**, highlighting regions contributing to predictions.
 
 ---
-
 ## 🗂️ Project Structure
+```bash
 AI-HISTOPATHOLOGY-CANCER-DETECTION/
 │
 ├── data/                           # Dataset directory (raw and processed images)
@@ -45,7 +45,7 @@ AI-HISTOPATHOLOGY-CANCER-DETECTION/
 ├── .gitattributes
 ├── .gitignore
 ├── models.rar                      # Archived model files (for sharing/deployment)
-└── README.md                       
+└── README.md                 
 ---
 
 ## 🧩 Model Details
