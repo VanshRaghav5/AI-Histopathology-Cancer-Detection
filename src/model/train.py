@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from src.model.dataset import create_train_val_loaders
 from src.model.model import get_model
-from src.model.utils import save_checkpoint, load_checkpoint  # Assuming utils.py has these
+from src.model.utils import save_checkpoint, load_checkpoint 
 
 
 def set_seed(seed: int = 42):
