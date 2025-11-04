@@ -126,12 +126,9 @@ Prediction: Malignant
 Confidence: 0.93
 🖼️ Visualization Output
 Generated Grad-CAM visualizations are saved under:
-
-Copy code
 gradcam_outputs/
-Example output files:
 
-Copy code
+Example output files:
 ductal_carcinoma_1_gradcam.png
 ductal_carcinoma_2_gradcam.png
 lobular_carcinoma_3452_gradcam.png
