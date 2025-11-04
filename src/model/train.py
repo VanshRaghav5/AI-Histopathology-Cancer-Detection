@@ -50,7 +50,7 @@ def train(args):
     num_benign = 1013 
     num_malignant = 5429  
     weight_benign = num_malignant / total_samples 
-    weights = ```````````torch.tensor([total_samples / (2 * num_benign), total_samples / (2 * num_malignant)]).to(device)
+    weights = torch.tensor([total_samples / (2 * num_benign), total_samples / (2 * num_malignant)], dtype=torch.float, device=device)
     criterion = nn.CrossEntropyLoss(weight=weights)
     optimizer = Adam(model.parameters(), lr=args.lr)
     scheduler = StepLR(optimizer, step_size=7, gamma=0.1)

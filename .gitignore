@@ -3,9 +3,7 @@ data/
 *.zip
 
 # trained models
-models/
-*.pth
-*.h5
+
 
 # notebooks cache
 .ipynb_checkpoints/
@@ -18,6 +16,7 @@ __pycache__/
 *.pyc
 venv/
 .venv/
-test_data.py
-verify_model.py
 notes
+__pycache__/
+outputs/
+logs/
