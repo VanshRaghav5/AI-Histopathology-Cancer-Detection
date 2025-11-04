@@ -1,0 +1,136 @@
+import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai"
+
+const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
+
+if (!GEMINI_API_KEY) {
+  console.error(`[v0] Missing Gemini API Key. Please set NEXT_PUBLIC_GEMINI_API_KEY in your environment variables.`)
+}
+
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" })
+
+export interface PredictionResult {
+  prediction: "Cancerous" | "Non-Cancerous"
+  confidence: number
+  analysis: string
+  processing_time?: number
+}
+
+export interface ApiError {
+  message: string
+  status: number
+}
+
+export const histopathologyAPI = {
+  async predictCancer(imageFile: File): Promise<PredictionResult> {
+    try {
+      const startTime = Date.now()
+
+      // Convert File to base64
+      const fileBuffer = await imageFile.arrayBuffer()
+      const base64String = Buffer.from(fileBuffer).toString('base64')
+
+      // Prepare the prompt
+      const prompt = "Analyze this histopathology image and determine if it shows signs of cancer. Provide your analysis in this JSON format: {prediction: 'Cancerous' or 'Non-Cancerous', confidence: number between 0 and 1, analysis: 'detailed explanation of findings'}. Base your analysis on cellular patterns, tissue organization, and any abnormal features visible in the image."
+
+      try {
+        const result = await model.generateContent([
+          prompt,
+          {
+            inlineData: {
+              mimeType: imageFile.type,
+              data: base64String
+            }
+          }
+        ])
+
+        const response = await result.response
+        const text = response.text()
+        
+        try {
+          const analysisResult = JSON.parse(text)
+          return {
+            prediction: analysisResult.prediction,
+            confidence: analysisResult.confidence,
+            analysis: analysisResult.analysis,
+            processing_time: Date.now() - startTime
+          }
+        } catch (parseError) {
+          // If JSON parsing fails, make a best effort to extract information
+          const isCancerous = text.toLowerCase().includes("cancer") || text.toLowerCase().includes("malignant")
+          return {
+            prediction: isCancerous ? "Cancerous" : "Non-Cancerous",
+            confidence: 0.7,
+            analysis: text,
+            processing_time: Date.now() - startTime
+          }
+        }
+      } catch (error) {
+
+      const response = await apiClient.post<PredictionResult>("/predict", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+
+      console.log("[v0] Raw API response:", response.data)
+
+      if (typeof response.data === "string" && response.data.includes("<!DOCTYPE html>")) {
+        throw new Error(
+          `API endpoint returned HTML instead of JSON. This usually means:\n1. Your API URL (${API_BASE_URL}) is pointing to a web page instead of your FastAPI server\n2. Your FastAPI server is not running\n3. The /predict endpoint doesn't exist on your server`,
+        )
+      }
+
+      if (!response.data) {
+        throw new Error("Empty response from API")
+      }
+
+      const { prediction, confidence, heatmap_url, processing_time } = response.data
+
+      if (!prediction || (prediction !== "Cancerous" && prediction !== "Non-Cancerous")) {
+        throw new Error(`Invalid prediction value from API: ${prediction}. Expected "Cancerous" or "Non-Cancerous"`)
+      }
+
+      if (typeof confidence !== "number" || isNaN(confidence)) {
+        throw new Error(`Invalid confidence value from API: ${confidence}. Expected a number between 0 and 1`)
+      }
+
+      return {
+        prediction,
+        confidence,
+    } catch (error) {
+      console.error("[v0] Gemini API Error:", error)
+      throw {
+        message: error instanceof Error ? error.message : "Failed to analyze image",
+        status: 500
+      }
+    }
+  },
+
+  async healthCheck(): Promise<boolean> {
+    try {
+      if (!GEMINI_API_KEY) {
+        console.error("[v0] Missing Gemini API Key")
+        return false
+      }
+
+      // Simple test to check if the API key is valid
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" })
+      await model.generateContent("Test connection")
+      return true
+    } catch (error) {
+      console.error("[v0] Gemini API health check failed:", error)
+      return false
+    }
+
+    }
+  },
+
+  getApiConfig(): { url: string; isValid: boolean } {
+    return {
+      url: "https://generativelanguage.googleapis.com",
+      isValid: Boolean(GEMINI_API_KEY),
+    }
+  },
+}
