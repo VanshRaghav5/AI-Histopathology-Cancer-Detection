@@ -49,7 +49,7 @@ AI-HISTOPATHOLOGY-CANCER-DETECTION/
 ---
 
 ## 🧩 Model Details
-- **Architecture:** CNN-based / Transfer Learning (e.g., ResNet50)
+- **Architecture:** CNN-based / Transfer Learning (e.g., MobileNetV2)
 - **Input Size:** 224×224 (RGB)
 - **Output Classes:** `Benign`, `Malignant`
 - **Framework:** PyTorch
