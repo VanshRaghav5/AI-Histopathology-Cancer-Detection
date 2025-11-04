@@ -9,45 +9,43 @@ The model classifies microscopic tissue slide images as **Benign** or **Malignan
 ## 🗂️ Project Structure
 AI-HISTOPATHOLOGY-CANCER-DETECTION/
 │
-├── data/ # Dataset directory (raw and processed images)
+├── data/                           # Dataset directory (raw and processed images)
 │
-├── gradcam_outputs/ # Generated Grad-CAM visualizations
-│ ├── ductal_carcinoma_1_gradcam.png
-│ ├── ductal_carcinoma_2_gradcam.png
-│ ├── lobular_carcinoma_3452_gradcam.png
-│ └── SOB_B_A-14-22549AB-40-001_gradcam.png
+├── gradcam_outputs/                # Generated Grad-CAM visualizations
+│   ├── ductal_carcinoma_1_gradcam.png
+│   ├── ductal_carcinoma_2_gradcam.png
+│   ├── lobular_carcinoma_3452_gradcam.png
+│   └── SOB_B_A-14-22549AB-40-001_gradcam.png
 │
-├── models/ # Model weights and checkpoints
-│ ├── checkpoint.pth
-│ └── model_best.pth
+├── models/                         # Model weights and checkpoints
+│   ├── checkpoint.pth
+│   └── model_best.pth
 │
-├── scripts/ # Helper scripts for inference and Grad-CAM generation
-│ ├── generate_gradcam.py
-│ └── gradcamoutput.png
+├── scripts/                        # Helper scripts for inference and Grad-CAM generation
+│   ├── generate_gradcam.py
+│   └── gradcamoutput.png
 │
-├── src/ # Source code
-│ ├── model/
-│ │ ├── init.py
-│ │ ├── dataset.py # Data loading and augmentation
-│ │ ├── gradcam.py # Grad-CAM implementation
-│ │ ├── model.py # CNN / ResNet model definition
-│ │ ├── train.py # Model training logic
-│ │ ├── utils.py # Utility functions (metrics, visualization, etc.)
-│ │ └── pycache/ # Compiled cache
-│ └── pycache/
+├── src/                            # Source code
+│   ├── model/
+│   │   ├── __init__.py
+│   │   ├── dataset.py              # Data loading and augmentation
+│   │   ├── gradcam.py              # Grad-CAM implementation
+│   │   ├── model.py                # CNN / ResNet model definition
+│   │   ├── train.py                # Model training logic
+│   │   ├── utils.py                # Utility functions (metrics, visualization, etc.)
+│   │   └── __pycache__/            # Compiled cache
+│   └── __pycache__/
 │
-├── text/ # Notes, experiment logs, or documentation
+├── text/                           # Notes, experiment logs, or documentation
 │
-├── notes/ # Additional project notes
+├── notes/                          # Additional project notes
 │
-├── venv/ # Virtual environment (optional)
+├── venv/                           # Virtual environment (optional)
 │
 ├── .gitattributes
 ├── .gitignore
-├── models.rar # Archived model files (for sharing/deployment)
-└── README.md # Project documentation
-
-
+├── models.rar                      # Archived model files (for sharing/deployment)
+└── README.md                       
 ---
 
 ## 🧩 Model Details
