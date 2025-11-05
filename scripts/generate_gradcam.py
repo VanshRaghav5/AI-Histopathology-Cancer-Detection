@@ -9,16 +9,6 @@ from PIL import Image
 import tkinter as tk
 from tkinter import filedialog
 
-# --- Fix import paths ---
-# Assuming your structure is:
-# project_root/
-# ├── models/
-# ├── src/
-# │   ├── model/
-# │   │   ├── model.py
-# │   │   ├── dataset.py
-# └── scripts/
-#     └── gradcam_viewer.py
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
@@ -27,9 +17,7 @@ if project_root not in sys.path:
 from src.model.model import get_model
 from src.model.dataset import get_transforms
 
-
 def get_gradcam_standard(model, input_tensor, target_class=None):
-    """Compute Grad-CAM heatmap for a given image and model."""
     model.eval()
     input_tensor.requires_grad_(True)
 
@@ -44,7 +32,6 @@ def get_gradcam_standard(model, input_tensor, target_class=None):
         nonlocal gradients
         gradients = grad_output[0]
 
-    # 🧩 Adjust this layer based on your architecture if needed
     target_layer = model.features[-4]
     fwd_handle = target_layer.register_forward_hook(forward_hook)
     bwd_handle = target_layer.register_full_backward_hook(backward_hook)
@@ -79,23 +66,28 @@ def get_gradcam_standard(model, input_tensor, target_class=None):
     return cam
 
 
-def visualize_gradcam(image_path, model, transform, device):
-    """Run model prediction + Grad-CAM and display results."""
+def visualize_gradcam(image_path, model, transform, device, temperature=2.0):
     image = Image.open(image_path).convert("RGB")
     input_tensor = transform(image).unsqueeze(0).to(device)
 
     with torch.no_grad():
         output = model(input_tensor)
-        probs = F.softmax(output, dim=1)[0].cpu().numpy()
-        pred_class = output.argmax(dim=1).item()
-        confidence = probs[pred_class]
+
+        logits = output - output.max(dim=1, keepdim=True)[0]
+     
+        probs = F.softmax(logits / temperature, dim=1)[0].cpu().numpy()
+
+        pred_class = int(np.argmax(probs))
+        confidence = float(probs[pred_class])
 
     pred_label = '🧬 Malignant (Cancerous)' if pred_class == 1 else '🌿 Benign (Non-Cancerous)'
+
     print(f"\n🖼️ Image: {os.path.basename(image_path)}")
     print(f"Prediction: {pred_label} (Class {pred_class})")
     print(f"Confidence: {confidence:.4f}")
     print(f"Benign Prob: {probs[0]:.4f} | Malignant Prob: {probs[1]:.4f}")
 
+  
     try:
         gradcam = get_gradcam_standard(model, input_tensor.clone().requires_grad_(True), pred_class)
         print("✅ Grad-CAM computed successfully!")
@@ -109,7 +101,6 @@ def visualize_gradcam(image_path, model, transform, device):
     overlay = 0.4 * heatmap + 0.6 * img_np
     overlay = np.clip(overlay, 0, 255).astype(np.uint8)
 
-    # Show visualization
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     axes[0].imshow(img_np)
     axes[0].set_title('Original Image')
@@ -172,7 +163,7 @@ def main():
             print("\n✅ Session ended. Exiting Grad-CAM viewer.")
             break
 
-        visualize_gradcam(file_path, model, transform, device)
+        visualize_gradcam(file_path, model, transform, device, temperature=2.0)
 
 
 if __name__ == "__main__":
