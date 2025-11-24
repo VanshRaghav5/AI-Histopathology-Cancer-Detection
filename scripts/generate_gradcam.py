@@ -9,9 +9,7 @@ from PIL import Image
 import tkinter as tk
 from tkinter import filedialog
 
-# ----------------------------------------------------
-# Make sure project root is on sys.path
-# ----------------------------------------------------
+
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
@@ -20,14 +18,9 @@ from src.model.model import get_model
 from src.model.dataset import get_transforms
 
 
-# ----------------------------------------------------
-# Grad-CAM using ResNet branch of Fusion model
-# ----------------------------------------------------
+
 def get_gradcam_standard(model, input_tensor, target_class=None):
-    """
-    Computes Grad-CAM using the last conv block of ResNet50
-    inside the fusion model (model.resnet.layer4[-1]).
-    """
+  
     model.eval()
     input_tensor.requires_grad_(True)
 
@@ -36,14 +29,13 @@ def get_gradcam_standard(model, input_tensor, target_class=None):
 
     def forward_hook(module, input, output):
         nonlocal activations
-        # keep activations with grad support
+       
         activations = output
 
     def backward_hook(module, grad_input, grad_output):
         nonlocal gradients
         gradients = grad_output[0]
 
-    # ✅ For fusion model: use ResNet's last conv block
     target_layer = model.resnet.layer4[-1]
 
     fwd_handle = target_layer.register_forward_hook(forward_hook)
@@ -65,13 +57,12 @@ def get_gradcam_standard(model, input_tensor, target_class=None):
     if activations is None or gradients is None:
         raise ValueError("Could not capture activations or gradients.")
 
-    # GAP over spatial dims -> channel-wise weights
-    # gradients: [B, C, H, W]
-    weights = torch.mean(gradients, dim=(2, 3), keepdim=True)  # [B, C, 1, 1]
-    cam = torch.sum(weights * activations, dim=1).squeeze()     # [H, W]
+
+    weights = torch.mean(gradients, dim=(2, 3), keepdim=True)  
+    cam = torch.sum(weights * activations, dim=1).squeeze()    
     cam = F.relu(cam)
 
-    # Resize CAM to 224x224
+  
     cam = F.interpolate(
         cam.unsqueeze(0).unsqueeze(0),
         size=(224, 224),
@@ -79,7 +70,7 @@ def get_gradcam_standard(model, input_tensor, target_class=None):
         align_corners=False
     ).squeeze().detach().cpu().numpy()
 
-    # Normalize between 0 and 1
+
     cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
     return cam
 
@@ -88,14 +79,11 @@ def visualize_gradcam(image_path, model, transform, device, temperature=2.0):
     image = Image.open(image_path).convert("RGB")
     input_tensor = transform(image).unsqueeze(0).to(device)
 
-    # -----------------------------
-    # Forward pass & confidence
-    # -----------------------------
+  
     with torch.no_grad():
-        output = model(input_tensor)  # [1, 2]
+        output = model(input_tensor) 
 
-        # ✅ Numerically stable + temp scaling
-        # PyTorch softmax is already stable, no need for extra shifting
+   
         probs_tensor = F.softmax(output / temperature, dim=1)[0]
         probs = probs_tensor.cpu().numpy()
 
@@ -109,9 +97,7 @@ def visualize_gradcam(image_path, model, transform, device, temperature=2.0):
     print(f"Confidence: {confidence:.4f}")
     print(f"Benign Prob: {probs[0]:.4f} | Malignant Prob: {probs[1]:.4f}")
 
-    # -----------------------------
-    # Grad-CAM
-    # -----------------------------
+ 
     try:
         gradcam = get_gradcam_standard(
             model, input_tensor.clone().requires_grad_(True), pred_class
@@ -166,7 +152,6 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    # ✅ Explicitly load fusion model
     model = get_model(name="fusion", num_classes=2, pretrained=False)
 
     checkpoint = torch.load(model_path, map_location=device)
