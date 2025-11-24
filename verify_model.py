@@ -7,12 +7,13 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 
-# Use GPU if available
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-# Load your model
-model = get_model(num_classes=2, pretrained=False)
+
+model = get_model(name="fusion", num_classes=2, pretrained=False)
+
 checkpoint_path = 'models/model_best.pth'
 
 if not os.path.exists(checkpoint_path):
@@ -20,13 +21,15 @@ if not os.path.exists(checkpoint_path):
     exit()
 
 checkpoint = torch.load(checkpoint_path, map_location=device)
+
 model.load_state_dict(checkpoint['model_state_dict'])
+
 model.to(device)
 model.eval()
 
 print(f"✅ Loaded model from {checkpoint_path}")
 
-# Print metrics if available
+
 best_acc = checkpoint.get('best_acc', 'N/A')
 best_f1 = checkpoint.get('best_f1', 'N/A')
 best_auc = checkpoint.get('best_auc', 'N/A')
@@ -34,12 +37,12 @@ epoch = checkpoint.get('epoch', 'N/A')
 
 print(f"📊 Best Validation — Acc: {best_acc}, F1: {best_f1}, AUC: {best_auc}, Epoch: {epoch}")
 
-# Load image transform
+
 transform = get_transforms(train=False, size=224)
 
-# --- File upload GUI loop ---
+
 root = tk.Tk()
-root.withdraw()  # Hide main window
+root.withdraw()  
 
 print("\n🧩 Model ready! Upload images one by one to test predictions.")
 print("Press 'Cancel' in the file dialog when done.\n")
@@ -54,7 +57,7 @@ while True:
         print("✅ Testing finished.")
         break
 
-    # Load and preprocess image
+  
     try:
         image = Image.open(file_path).convert("RGB")
     except Exception as e:
@@ -63,7 +66,7 @@ while True:
 
     input_tensor = transform(image).unsqueeze(0).to(device)
 
-    # Model prediction
+   
     with torch.no_grad():
         output = model(input_tensor)
         probs = F.softmax(output, dim=1)[0].cpu().numpy()
