@@ -40,8 +40,7 @@ AI-HISTOPATHOLOGY-CANCER-DETECTION/
 │   └── model_best.pth     # Download externally (677 MB)
 │
 ├── scripts/
-│   ├── generate_gradcam.py
-│   ├── generate_guided_gradcam.py
+│   ├── generate_gradcam.py│   
 │   └── generate_joint_gradcam.py
 │
 ├── src/
