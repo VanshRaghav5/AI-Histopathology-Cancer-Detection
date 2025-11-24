@@ -1,180 +1,170 @@
-# 🧠 AI Histopathology Cancer Detection — Model Development & Verification
+# 🧠 AI Histopathology Cancer Detection — Fusion Model (ResNet50 + VGG16)
 
 ## 📌 Overview
-This project focuses on the **deep learning model development, training, and verification** for **histopathology cancer detection**.  
-The model classifies microscopic tissue slide images as **Benign** or **Malignant** and enhances interpretability using **Grad-CAM heatmaps**, highlighting regions contributing to predictions.
+This repository contains the **Fusion Deep Learning Model** developed for **breast cancer histopathology image classification**.
+
+The system identifies tissue as:
+
+- **Benign (Non-Cancerous)**
+- **Malignant (Cancerous)**
+
+To achieve high accuracy and better tissue-level understanding, the model uses:
+
+### 🔥 Fusion Architecture
+- **ResNet50** (deep semantic features)  
+- **VGG16** (fine-grained texture features)  
+- Feature vectors are **concatenated** and passed into custom fully connected layers.
+
+### 🎯 Explainability Included
+To ensure transparency, the project includes:
+- **Grad-CAM**
+- **Guided Grad-CAM**
+- **Joint Grad-CAM** (Fusion model explainability combining both backbones)
 
 ---
-## 🗂️ Project Structure
+
+## 🗂 Project Structure
+
 ```bash
 AI-HISTOPATHOLOGY-CANCER-DETECTION/
 │
-├── data/                           # Dataset directory (raw and processed images)
+├── data/                         
 │
-├── gradcam_outputs/                # Generated Grad-CAM visualizations
-│   ├── ductal_carcinoma_1_gradcam.png
-│   ├── ductal_carcinoma_2_gradcam.png
-│   ├── lobular_carcinoma_3452_gradcam.png
-│   └── SOB_B_A-14-22549AB-40-001_gradcam.png
+├── gradcam_outputs/              
+│   ├── *_gradcam.png
+│   ├── *_guided_gradcam.png
+│   └── *_joint_gradcam.png
 │
-├── models/                         # Model weights and checkpoints
+├── models/
 │   ├── checkpoint.pth
-│   └── model_best.pth
+│   └── model_best.pth     # Download externally (677 MB)
 │
-├── scripts/                        # Helper scripts for inference and Grad-CAM generation
+├── scripts/
 │   ├── generate_gradcam.py
-│   └── gradcamoutput.png
+│   ├── generate_guided_gradcam.py
+│   └── generate_joint_gradcam.py
 │
-├── src/                            # Source code
+├── src/
 │   ├── model/
-│   │   ├── __init__.py
-│   │   ├── dataset.py              # Data loading and augmentation
-│   │   ├── gradcam.py              # Grad-CAM implementation
-│   │   ├── model.py                # CNN / ResNet model definition
-│   │   ├── train.py                # Model training logic
-│   │   ├── utils.py                # Utility functions (metrics, visualization, etc.)
-│   │   └── __pycache__/            # Compiled cache
-│   └── __pycache__/
+│   │   ├── dataset.py
+│   │   ├── model.py                # Fusion Model
+│   │   ├── train.py
+│   │   ├── utils.py
+│   │   └── gradcam.py
 │
-├── text/                           # Notes, experiment logs, or documentation
-│
-├── notes/                          # Additional project notes
-│
-├── venv/                           # Virtual environment (optional)
-│
-├── .gitattributes
-├── .gitignore
-├── models.rar                      # Archived model files (for sharing/deployment)
-└── README.md                 
+├── notes/
+├── text/
+├── venv/
+└── README.md
+```
+
+---
+
+## 📥 Download Model (677 MB)
+
+GitHub cannot host files >100 MB, so the trained fusion model is hosted externally.
+
+👉 **Download `model_best.pth`:**  
+https://drive.google.com/file/d/1-VyqwdJ9250jYR0rp7tKVGReao-9Q1fD/view?usp=drive_link
+
 ---
 
 ## 🧩 Model Details
-- **Architecture:** CNN-based / Transfer Learning (e.g., MobileNetV2)
-- **Input Size:** 224×224 (RGB)
-- **Output Classes:** `Benign`, `Malignant`
-- **Framework:** PyTorch
-- **Dataset:** Histopathology image dataset (multi-type cancer slides)
-- **Final Model File:** `models/model_best.pth`
+
+| Feature | Description |
+|--------|-------------|
+| **Architecture** | ResNet50 + VGG16 Fusion |
+| **Fusion Method** | Feature Concatenation → Dense Layers |
+| **Input Size** | 224×224 RGB |
+| **Output Classes** | Benign (0), Malignant (1) |
+| **Loss Function** | CrossEntropy |
+| **Best Epoch** | 4 |
+| **Explainability Tools** | Grad-CAM, Guided Grad-CAM, Joint Grad-CAM |
+
+---
+
+## 📊 Best Validation Metrics (Epoch 4)
+
+```
+Val Accuracy: 94.17%
+Train Accuracy: 90.45%
+F1 Score: ~0.94
+AUC-ROC: ~0.97+
+```
 
 ---
 
 ## ⚙️ Environment Setup
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/<your-username>/AI-Histopathology-Cancer-Detection.git
-   cd AI-Histopathology-Cancer-Detection
-Create and activate virtual environment
 
-bash
-Copy code
+### Clone the Repository
+```bash
+git clone https://github.com/<your-username>/AI-Histopathology-Cancer-Detection.git
+cd AI-Histopathology-Cancer-Detection
+```
+
+### Create Virtual Environment
+```bash
 python -m venv venv
-source venv/bin/activate      # for Linux/Mac
-venv\Scripts\activate         # for Windows
-Install dependencies
+venv\Scriptsctivate      # Windows
+source venv/bin/activate   # Linux/Mac
+```
 
-bash
-Copy code
+### Install Dependencies
+```bash
 pip install -r requirements.txt
-🧪 Model Training (src/model/train.py)
-The training pipeline includes:
+```
 
-Data preprocessing and augmentation
+---
 
-Train/validation data split using torch.utils.data.DataLoader
+## 🧪 Training the Fusion Model
 
-Model training loop with loss & accuracy tracking
+```bash
+python -m src.model.train --arch fusion --epochs 15 --batch_size 8 --lr 0.001 --pretrained
+```
 
-Automatic checkpoint saving (model_best.pth)
-
-▶️ Run Training
-bash
-Copy code
-python src/model/train.py
-After training completes, the best model weights are saved automatically in:
-
-bash
-Copy code
+Best model saved at:
+```
 models/model_best.pth
-🔍 Model Verification (scripts/generate_gradcam.py)
-This script verifies model predictions and interpretability using Grad-CAM.
+```
 
-✳️ Features
-Loads model_best.pth
+---
 
-Accepts a single histopathology image as input
+## 🔍 Explainability Tools
 
-Produces:
+### Standard Grad-CAM
+```bash
+python scripts/generate_gradcam.py
+```
 
-Original input image
+### Guided Grad-CAM
+```bash
+python scripts/generate_guided_gradcam.py
+```
 
-Grad-CAM heatmap
+### Joint Grad-CAM (Fusion)
+```bash
+python scripts/generate_joint_gradcam.py
+```
 
-Overlay visualization
-
-Displays prediction with confidence score
-
-▶️ Example Run
-bash
-Copy code
-python scripts/generate_gradcam.py --image path_to_image.jpg
-🧾 Example Output
-makefile
-Copy code
-Prediction: Malignant
-Confidence: 0.93
-🖼️ Visualization Output
-Generated Grad-CAM visualizations are saved under:
+Output saved in:
+```
 gradcam_outputs/
+```
 
-Example output files:
-ductal_carcinoma_1_gradcam.png
-ductal_carcinoma_2_gradcam.png
-lobular_carcinoma_3452_gradcam.png
-Each output includes:
+---
 
-Original Image
+## 📚 Technologies Used
+- PyTorch  
+- Torchvision  
+- OpenCV  
+- Matplotlib  
+- Tkinter  
+- NumPy  
+- Grad-CAM
 
-Grad-CAM Heatmap
+---
 
-Grad-CAM Overlay
-
-Predicted Class + Confidence Score
-
-⚙️ Tools & Libraries
-Library	Purpose
-PyTorch	Model training & inference
-Torchvision	Pretrained ResNet architectures
-OpenCV / PIL	Image processing
-Matplotlib	Visualization
-Grad-CAM	Model interpretability
-NumPy / Pandas	Data handling
-
-🧩 Results Summary
-✅ Achieved high validation accuracy on test samples
-✅ Grad-CAM correctly focused on cancerous tissue regions
-✅ Model verified and ready for deployment as model_best.pth
-
-📸 Example Grad-CAM Outputs
-Input Image	Grad-CAM Overlay
-
-💡 Usage Guide
-🔹 To Train a New Model:
-bash
-Copy code
-python src/model/train.py --epochs 50 --batch_size 32
-🔹 To Verify Model Predictions:
-bash
-Copy code
-python scripts/generate_gradcam.py --image path_to_image.jpg
-🔹 To View Grad-CAM Results:
-Open the saved image files inside:
-
-Copy code
-gradcam_outputs/
-💡 Future Improvements
-Expand to multi-class classification for different cancer subtypes
-
-👤 Contributor
-Vansh Raghav
-Model Design • Training • Verification (Grad-CAM)
+## 👤 Contributor
+**Vansh Raghav**
+_Model Fusion • Training • Verification • Explainability (Grad-CAM)_
 
