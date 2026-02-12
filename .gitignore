@@ -1,0 +1,22 @@
+# datasets
+data/
+*.zip
+
+# trained models
+
+
+# notebooks cache
+.ipynb_checkpoints/
+
+# system files
+.DS_Store
+
+# python environment files
+__pycache__/
+*.pyc
+venv/
+.venv/
+notes
+__pycache__/
+outputs/
+logs/
